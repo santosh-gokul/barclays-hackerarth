@@ -2,6 +2,7 @@ from fastapi import FastAPI, Path, Depends
 from fastapi.responses import JSONResponse
 from app.data.items import item_data
 from app.data.store import store_data
+from app.models.api import LoginData
 
 
 store_name_list = [store['Store_Name'] for store in store_data["Bangalore Outlet Details"]]
@@ -11,7 +12,7 @@ store_item_map = {}
 for store in store_name_list:
     store_item_map[store] = {}
     for item_info in item_data['Data']:
-        store_item_map[item_info['Name']] = item_info
+        store_item_map[item_info['name']] = item_info
 
 def getTotalItemWithinAStore(store: str):
     item_count = 0
@@ -28,11 +29,11 @@ userLoginDetails = {
 }
 
 @app.post(f"/login")
-def loginUser(loginData: dict):
-    if loginData['uname'] not in userLoginDetails:
+def loginUser(loginData: LoginData):
+    if loginData.uname not in userLoginDetails:
         return JSONResponse(status_code=400, content={'success': False})
     else:
-        if (hash(loginData['pass'])==userLoginDetails[loginData['uname']]):
+        if (hash(loginData.password)==userLoginDetails[loginData.uname]):
             return JSONResponse(status_code=200, content={'success': True})
         else:
             return JSONResponse(status_code=400, content={'success': False})
