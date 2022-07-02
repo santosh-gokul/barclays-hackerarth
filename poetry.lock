@@ -89,7 +89,6 @@ numpy = [
     {version = ">=1.18.5", markers = "platform_machine != \"aarch64\" and platform_machine != \"arm64\" and python_version < \"3.10\""},
     {version = ">=1.19.2", markers = "platform_machine == \"aarch64\" and python_version < \"3.10\""},
     {version = ">=1.20.0", markers = "platform_machine == \"arm64\" and python_version < \"3.10\""},
-    {version = ">=1.21.0", markers = "python_version >= \"3.10\""},
 ]
 python-dateutil = ">=2.8.1"
 pytz = ">=2020.1"
@@ -188,7 +187,7 @@ standard = ["websockets (>=10.0)", "httptools (>=0.4.0)", "watchfiles (>=0.13)",
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.0"
-content-hash = "dda44e846d0e1f49946effe74cba2fd8622bff77fbff7a617f2847e1f3419096"
+content-hash = "32f1cc4acbb86c43014b39b1df8dd0e92b4bcd6a3401968f3e7a98c66e12ac11"
 
 [metadata.files]
 anyio = [
