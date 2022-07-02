@@ -3,6 +3,21 @@ from fastapi.responses import JSONResponse
 from app.data.items import item_data
 from app.data.store import store_data
 
+
+store_name_list = [store['Store_Name'] for store in store_data["Bangalore Outlet Details"]]
+store_item_map = {}
+
+for store in store_name_list:
+    store_item_map[store] = dict(item_data['Data'])
+
+def getTotalItemWithinAStore(store: str):
+    item_count = 0
+    for item in store_item_map[store]:
+        if (item['quantity']>0):
+            item_count+=1
+
+    return item_count
+
 app = FastAPI()
 
 userLoginDetails = {
@@ -20,10 +35,21 @@ def loginUser(loginData: dict):
             return JSONResponse(status_code=400, content={'success': False})
 
 
-@app.get("/get_store_details")
-def get_store_details():
-    return JSONResponse(status_code=200, content = {'success': True,
-    'data': store_data["Bangalore Outlet Details"]})
+@app.get("/get_store_details/{store_name}")
+def get_store_details(store_name: str):
+    if(store_name not in store_name_list):
+        return_val = []
+        for store in store_name_list:
+            return_val.append({**store_data["Bangalore Outlet Details"][store_name_list.index(store)]
+            , 'item_count': getTotalItemWithinAStore(store)})
+        return JSONResponse(status_code=200, content = {'success': True,
+        'data': return_val})
+    else:
+        total_item_count = getTotalItemWithinAStore(store_name)
+        return JSONResponse(status_code=200, content = {'success': True,
+        'data': {**store_data["Bangalore Outlet Details"][store_name_list.index(store_name)]
+        , 'item_count': total_item_count}
+        })
 
 @app.get("/get_item_details")
 def get_item_details():
