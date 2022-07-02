@@ -12,8 +12,8 @@ store_item_map = {}
 for store in store_name_list:
     store_item_map[store] = {}
     for item_info in item_data['Data']:
-        store_item_map[item_info['name']] = item_info
-    print(store_item_map)
+        store_item_map[store][item_info['name']] = item_info
+    print(len(store_item_map[store].keys()), "COUNT")
 
 
 def getTotalItemWithinAStore(store: str):
