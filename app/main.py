@@ -13,13 +13,14 @@ for store in store_name_list:
     store_item_map[store] = {}
     for item_info in item_data['Data']:
         store_item_map[item_info['name']] = item_info
+    print(store_item_map)
+
 
 def getTotalItemWithinAStore(store: str):
     item_count = 0
     for item in store_item_map[store].values():
         if (int(item['quantity'])>0):
             item_count+=1
-
     return item_count
 
 app = FastAPI()
