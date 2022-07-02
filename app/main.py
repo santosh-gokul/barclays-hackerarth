@@ -9,12 +9,14 @@ item_name_list = [item['name'] for item in item_data["Data"]]
 store_item_map = {}
 
 for store in store_name_list:
-    store_item_map[store] = list(item_data['Data'])
+    store_item_map[store] = {}
+    for item_info in item_data['Data']:
+        store_item_map[item_info['Name']] = item_info
 
 def getTotalItemWithinAStore(store: str):
     item_count = 0
-    for item in store_item_map[store]:
-        if (item['quantity']>0):
+    for item in store_item_map[store].values():
+        if (int(item['quantity'])>0):
             item_count+=1
 
     return item_count
