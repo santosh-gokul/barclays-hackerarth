@@ -4,6 +4,9 @@ from app.data.items import item_data
 from app.data.store import store_data
 from app.models.api import LoginData, NearestStore
 import geopy.distance
+import jwt
+import time
+from app.core.config import settings
 
 
 store_name_list = [store['Store_Name'] for store in store_data["Bangalore Outlet Details"]]
@@ -18,7 +21,6 @@ for store in store_name_list:
     for item_info in item_data['Data']:
         if item_info['outOfStock']=="FALSE":
             store_item_map[store][item_info['name']] = item_info
-    print(len(store_item_map[store].keys()), "COUNT")
 
 
 def getTotalItemWithinAStore(store: str):
@@ -34,19 +36,39 @@ userLoginDetails = {
     'Santosh': hash('passoword')
 }
 
+@app.get("/validate_token/{token}")
+def validate_token(token: str):
+    try:
+        decode_data = jwt.decode(token, settings.SECRET, algorithms=["HS256"])
+        print("decoded data", decode_data, type(decode_data['token_id']))
+        if (int(decode_data['expiry'])>=time.time()):
+            return JSONResponse(status_code=401, content={'success': False})
+        return JSONResponse(status_code=200, content={'success': True})
+    except jwt.exceptions.InvalidSignatureError as e:
+        return JSONResponse(status_code=401, content={'success': False})
+
+
 @app.post(f"/login")
 def loginUser(loginData: LoginData):
     if loginData.uname not in userLoginDetails:
         return JSONResponse(status_code=400, content={'success': False})
     else:
         if (hash(loginData.password)==userLoginDetails[loginData.uname]):
-            return JSONResponse(status_code=200, content={'success': True})
+            jwt_payload = {
+                    "expiry": int(time.time()+600),
+                    "username": loginData.uname,
+                }
+            encoded_jwt = jwt.encode(jwt_payload, settings.SECRET, algorithm="HS256")
+            return JSONResponse(status_code=200, content={'success': True, 'token': encoded_jwt})
         else:
             return JSONResponse(status_code=400, content={'success': False})
 
 
-@app.get("/get_store_details/{store_name}")
-def get_store_details(store_name: str):
+@app.get("/get_store_details/{store_name}/{token}")
+def get_store_details(store_name: str, token: str):
+    result = validate_token(token=token)
+    if result.status_code!=200:
+       return JSONResponse(status_code=401, content={'success': False})
     if(store_name not in store_name_list):
         return_val = []
         for store in store_name_list:
@@ -61,8 +83,11 @@ def get_store_details(store_name: str):
         , 'item_count': total_item_count}
         })
 
-@app.get("/get_item_details/{item_name}")
-def get_item_details(item_name: str):
+@app.get("/get_item_details/{item_name}/{token}")
+def get_item_details(item_name: str, token: str):
+    result = validate_token(token=token)
+    if result.status_code!=200:
+       return JSONResponse(status_code=401, content={'success': False})
     if(item_name not in item_name_list):
         return JSONResponse(status_code=200, content = {'success': True,
         'data': item_data["Data"]})
@@ -71,8 +96,11 @@ def get_item_details(item_name: str):
         'data': [item_data["Data"][item_name_list.index(item_name)]]})
 
 
-@app.post("/get_nearest_store")
-def get_nearest_store(input: NearestStore):
+@app.post("/get_nearest_store/{token}")
+def get_nearest_store(token:str, input: NearestStore):
+    result = validate_token(token=token)
+    if result.status_code!=200:
+       return JSONResponse(status_code=401, content={'success': False})
     viable_candidates = []
     for store in store_item_map:
         flag = False
