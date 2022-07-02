@@ -6,13 +6,17 @@ from app.models.api import LoginData
 
 
 store_name_list = [store['Store_Name'] for store in store_data["Bangalore Outlet Details"]]
-item_name_list = [item['name'] for item in item_data["Data"]]
+item_name_list = []
+for item in item_data["Data"]:
+    if item['outOfStock']!="FALSE":
+        item_name_list.append(item['name'])
 store_item_map = {}
 
 for store in store_name_list:
     store_item_map[store] = {}
     for item_info in item_data['Data']:
-        store_item_map[store][item_info['name']] = item_info
+        if item_info['outOfStock']!="FALSE":
+            store_item_map[store][item_info['name']] = item_info
     print(len(store_item_map[store].keys()), "COUNT")
 
 
