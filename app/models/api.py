@@ -36,6 +36,7 @@ class Coordinates(BaseModel):
     lat: float
     lon: float
 
+
 class NearestStore(BaseModel):
     item_details: List[ItemAndCount]
     user_location: Coordinates
