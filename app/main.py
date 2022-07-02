@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from app.data.items import item_data
 from app.data.store import store_data
 from app.models.api import LoginData, NearestStore
+import geopy.distance
 
 
 store_name_list = [store['Store_Name'] for store in store_data["Bangalore Outlet Details"]]
@@ -84,18 +85,19 @@ def get_nearest_store(input: NearestStore):
         if flag is False:
             viable_candidates.append(store)
 
-    min_distance = 100
+    min_distance = 1e10
     for store in viable_candidates:
         lat = store_data["Bangalore Outlet Details"][store_name_list.index(store)]["Latitude"]
         lon = store_data["Bangalore Outlet Details"][store_name_list.index(store)]["Longitude"]
 
-        if((abs(float(lat)-input.user_location.lat) + 
-        abs(float(lon)-input.user_location.lon))<min_distance):
-            min_distance = abs(float(lat)-input.user_location.lat) + \
-        abs(float(lon)-input.user_location.lon)
+        if(geopy.distance.geodesic((lat, lon), (input.user_location.lat, 
+        input.user_location.lon)).km<min_distance):
+            min_distance = geopy.distance.geodesic((lat, lon), (input.user_location.lat, 
+        input.user_location.lon)).km
             best_store = store
             store_coord = [float(lat), float(lon)]
     
     return JSONResponse(status_code=200, content = {'success': True,
         'data': {'store_name': best_store, 'store_coordinates': store_coord},
         'distance': min_distance})
+        
