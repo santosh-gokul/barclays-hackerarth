@@ -78,7 +78,7 @@ def get_nearest_store(input: NearestStore):
         for item_count in input.item_details:
             item = item_count.item
             count = item_count.count
-            if(store_item_map[store][item]['quantity']<count):
+            if(int(store_item_map[store][item]['quantity'])<count):
                 flag = True
                 break
         if flag is False:
