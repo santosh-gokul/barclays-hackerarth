@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "barclays"
+version = "0.1.0"
+description = "API backend for barclays"
+authors = ["Santosh"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.78.0"
+pandas = "^1.4.3"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
