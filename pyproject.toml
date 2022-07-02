@@ -5,7 +5,7 @@ description = "API backend for barclays"
 authors = ["Santosh"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "3.9.0"
 fastapi = "^0.78.0"
 pandas = "^1.4.3"
 uvicorn = "^0.18.2"
