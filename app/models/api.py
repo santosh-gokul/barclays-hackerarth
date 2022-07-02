@@ -3,8 +3,8 @@ from fastapi import Body, Path
 from pydantic import BaseModel, validator
 
 class LoginData(BaseModel):
-    uname: str
-    password: str
+    uname: str = Body(...)
+    password: str = Body(...)
 
     @validator(uname)
     def uname_validator(cls, v):

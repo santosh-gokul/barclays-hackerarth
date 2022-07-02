@@ -29,7 +29,7 @@ userLoginDetails = {
 }
 
 @app.post(f"/login")
-def loginUser(loginData: LoginData):
+def loginUser(loginData: LoginData = Depends(LoginData)):
     if loginData.uname not in userLoginDetails:
         return JSONResponse(status_code=400, content={'success': False})
     else:
