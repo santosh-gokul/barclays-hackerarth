@@ -1,4 +1,3 @@
-from tkinter.tix import Tree
 from fastapi import FastAPI, Path, Depends
 from fastapi.responses import JSONResponse
 
@@ -7,7 +6,6 @@ app = FastAPI()
 userLoginDetails = {
     'Santosh': hash('passoword')
 }
-
 
 @app.post(f"/login")
 def loginUser(loginData: dict):
