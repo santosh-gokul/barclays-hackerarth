@@ -9,7 +9,7 @@ item_name_list = [item['name'] for item in item_data["Data"]]
 store_item_map = {}
 
 for store in store_name_list:
-    store_item_map[store] = dict(item_data['Data'])
+    store_item_map[store] = list(item_data['Data'])
 
 def getTotalItemWithinAStore(store: str):
     item_count = 0
