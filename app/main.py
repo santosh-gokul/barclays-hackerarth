@@ -76,8 +76,8 @@ def get_nearest_store(input: NearestStore):
     for store in store_item_map:
         flag = False
         for item_count in input.item_details:
-            item = item_count['item']
-            count = item_count['count']
+            item = item_count.item
+            count = item_count.count
             if(store_item_map[store][item]<count):
                 flag = True
                 break
@@ -97,4 +97,5 @@ def get_nearest_store(input: NearestStore):
             store_coord = [float(lat), float(lon)]
     
     return JSONResponse(status_code=200, content = {'success': True,
-        'data': {'store_name': best_store, 'store_coordinates': store_coord}})
+        'data': {'store_name': best_store, 'store_coordinates': store_coord},
+        'distance': min_distance})
