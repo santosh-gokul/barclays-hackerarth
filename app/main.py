@@ -100,18 +100,13 @@ def get_store_details(store_name: str, token: str):
         })
 
 @app.get("/get_item_details/{token}")
-def get_item_details(token: str, item_name: str):
+def get_item_details(token: str):
     result = validate_token(token=token)
     if result.status_code!=200:
        return JSONResponse(status_code=401, content={'success': False})
-    if(item_name not in item_name_list):
-        return JSONResponse(status_code=200, content = {'success': True,
+    return JSONResponse(status_code=200, content = {'success': True,
         'data': item_data["Data"]})
-    else:
-         return JSONResponse(status_code=200, content = {'success': True,
-        'data': [item_data["Data"][item_name_list.index(item_name)]]})
-
-
+    
 @app.post("/get_nearest_store/{token}")
 def get_nearest_store(token:str, input: NearestStore):
     result = validate_token(token=token)
