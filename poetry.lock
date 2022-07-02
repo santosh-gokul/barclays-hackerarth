@@ -187,7 +187,7 @@ standard = ["websockets (>=10.0)", "httptools (>=0.4.0)", "watchfiles (>=0.13)",
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.9"
+python-versions = "3.9.0"
 content-hash = "dda44e846d0e1f49946effe74cba2fd8622bff77fbff7a617f2847e1f3419096"
 
 [metadata.files]
