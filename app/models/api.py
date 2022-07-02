@@ -33,8 +33,8 @@ class ItemAndCount(BaseModel):
 
 
 class Coordinates(BaseModel):
-    x: float
-    y: float
+    lat: float
+    lon: float
 
 class NearestStore(BaseModel):
     item_details: List[ItemAndCount]
