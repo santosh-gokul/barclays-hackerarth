@@ -2,7 +2,7 @@ from fastapi import FastAPI, Path, Depends
 from fastapi.responses import JSONResponse
 from app.data.items import item_data
 from app.data.store import store_data
-from app.models.api import LoginData
+from app.models.api import LoginData, NearestStore
 
 
 store_name_list = [store['Store_Name'] for store in store_data["Bangalore Outlet Details"]]
@@ -68,3 +68,31 @@ def get_item_details(item_name: str):
     else:
          return JSONResponse(status_code=200, content = {'success': True,
         'data': [item_data["Data"][item_name_list.index(item_name)]]})
+
+
+@app.post("/get_nearest_store")
+def get_nearest_store(input: NearestStore):
+    viable_candidates = []
+    for store in store_item_map:
+        flag = False
+        for item, count in input.item_details:
+            if(store_item_map[store][item]<count):
+                flag = True
+                break
+        if flag is False:
+            viable_candidates.append(store)
+
+    min_distance = 100
+    for store in viable_candidates:
+        lat = store_data["Bangalore Outlet Details"][store_name_list.index(store)]["Latitude"]
+        lon = store_data["Bangalore Outlet Details"][store_name_list.index(store)]["Longitude"]
+
+        if((abs(float(lat)-input.user_location.lat) + 
+        abs(float(lon)-input.user_location.lon))<min_distance):
+            min_distance = abs(float(lat)-input.user_location.lat) + \
+        abs(float(lon)-input.user_location.lon)
+            best_store = store
+            store_coord = [float(lat), float(lon)]
+    
+    return JSONResponse(status_code=200, content = {'success': True,
+        'data': {'store_name': best_store, 'store_coordinates': store_coord}})
