@@ -5,6 +5,7 @@ from app.data.store import store_data
 
 
 store_name_list = [store['Store_Name'] for store in store_data["Bangalore Outlet Details"]]
+item_name_list = [item['name'] for item in item_data["Data"]]
 store_item_map = {}
 
 for store in store_name_list:
@@ -51,7 +52,11 @@ def get_store_details(store_name: str):
         , 'item_count': total_item_count}
         })
 
-@app.get("/get_item_details")
-def get_item_details():
-    return JSONResponse(status_code=200, content = {'success': True,
-    'data': item_data["Data"]})
+@app.get("/get_item_details/{item_name}")
+def get_item_details(item_name: str):
+    if(item_name not in item_name_list):
+        return JSONResponse(status_code=200, content = {'success': True,
+        'data': item_data["Data"]})
+    else:
+         return JSONResponse(status_code=200, content = {'success': True,
+        'data': [item_data["Data"][item_name_list.index(item_name)]]})
