@@ -99,8 +99,8 @@ def get_store_details(store_name: str, token: str):
         , 'item_count': total_item_count}
         })
 
-@app.get("/get_item_details/{item_name}/{token}")
-def get_item_details(item_name: str, token: str):
+@app.get("/get_item_details/{token}")
+def get_item_details(token: str, item_name: str):
     result = validate_token(token=token)
     if result.status_code!=200:
        return JSONResponse(status_code=401, content={'success': False})
