@@ -7,6 +7,7 @@ import geopy.distance
 import jwt
 import time
 from app.core.config import settings
+from fastapi.middleware.cors import CORSMiddleware
 
 
 store_name_list = [store['Store_Name'] for store in store_data["Bangalore Outlet Details"]]
@@ -31,6 +32,21 @@ def getTotalItemWithinAStore(store: str):
     return item_count
 
 app = FastAPI()
+
+origins = [
+    "http://localhost.tiangolo.com",
+    "https://localhost.tiangolo.com",
+    "http://localhost",
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 userLoginDetails = {
     'Santosh': hash('passoword')
