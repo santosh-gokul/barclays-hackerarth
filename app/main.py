@@ -33,12 +33,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/ui/", StaticFiles(directory="my-app/build/"), name="static")
+app.mount("/ui/", StaticFiles(directory="fron-end/build/"), name="static")
 
 @app.get("/", response_class=HTMLResponse)
 async def main(request: Request):
     print(f"Hello from - {request.headers}")
-    with open('my-app/build/index.html') as f:
+    with open('front-end/build/index.html') as f:
         data = f.read()
     return data
 
