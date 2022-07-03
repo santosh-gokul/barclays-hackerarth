@@ -50,7 +50,7 @@ userLoginDetails = {
 def validate_token(token: str):
     try:
         decode_data = jwt.decode(token, settings.SECRET, algorithms=["HS256"])
-        print("decoded data", decode_data, type(decode_data['token_id']))
+        print("decoded data", decode_data)
         if (int(decode_data['expiry'])>=time.time()):
             return JSONResponse(status_code=401, content={'success': False})
         return JSONResponse(status_code=200, content={'success': True})
