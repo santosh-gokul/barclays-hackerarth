@@ -162,5 +162,5 @@ def get_nearest_store_and_get_payment_token(token:str, input: NearestStore):
 
     return JSONResponse(status_code=200, content = {'success': True,
         'data': {'store_name': best_store, 'store_coordinates': store_coord},
-        'distance': min_distance, 'order_token': response["order_token"]})
+        'distance': min_distance, 'order_token': response.json()["order_token"]})
         
