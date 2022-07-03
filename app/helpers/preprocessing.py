@@ -6,7 +6,7 @@ def preprocess_item_dict(item_dict: dict):
     ctr_resp_items = {}
     return_dict = {'Data': []}
     for item in item_dict['Data']:
-        if item['name'] in seen:
+        if item['name'] not in seen:
             seen.append(item['name'])
             ctr_resp_items[item['name']] = 0
             return_dict['Data'].append(item)
