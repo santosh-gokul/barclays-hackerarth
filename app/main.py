@@ -33,7 +33,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/ui/", StaticFiles(directory="fron-end/build/"), name="static")
+app.mount("/ui/", StaticFiles(directory="front-end/build/"), name="static")
 
 @app.get("/", response_class=HTMLResponse)
 async def main(request: Request):
