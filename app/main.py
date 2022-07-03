@@ -51,7 +51,7 @@ def validate_token(token: str):
     try:
         decode_data = jwt.decode(token, settings.SECRET, algorithms=["HS256"])
         print("decoded data", decode_data)
-        if (int(decode_data['expiry'])>=time.time()):
+        if (int(decode_data['expiry'])<=int(time.time())):
             return JSONResponse(status_code=401, content={'success': False})
         return JSONResponse(status_code=200, content={'success': True})
     except jwt.exceptions.InvalidSignatureError as e:
