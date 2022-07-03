@@ -45,6 +45,7 @@ function App() {
       setCoordinates([position.coords.latitude, position.coords.longitude])
     });
   }
+  
     
   }, []);
 
@@ -385,6 +386,18 @@ token, totalDiscount, storeCoordinates, orderToken, storeDistance, storeName]);
   // JSX code for login form
   const renderForm = (
     <div className="form">
+      {              Store.addNotification({
+                title: 'Login',
+                message: 'Pls check your login credentials',
+                type: 'warning',                        
+                container: 'top-right',                
+                animationIn: ["animated", "fadeIn"],     
+                animationOut: ["animated", "fadeOut"],  
+                dismiss: {
+                  duration: 30000
+                }
+              })
+      }
       <form onSubmit={handleLogin}>
         <div className="input-container">
           <label>Username </label>
