@@ -38,6 +38,6 @@ class Coordinates(BaseModel):
 
 
 class NearestStore(BaseModel):
-    item_details: List[ItemAndCount]
+    item_details: List
     user_location: Coordinates
 

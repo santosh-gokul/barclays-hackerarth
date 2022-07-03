@@ -95,9 +95,7 @@ def get_nearest_store(token:str, input: NearestStore):
     viable_candidates = []
     for store in store_item_map:
         flag = False
-        for item_count in input.item_details:
-            item = item_count.item
-            count = item_count.count
+        for item,count in input.item_details:
             if(int(store_item_map[store][item]['availableQuantity'])<count):
                 flag = True
                 break
