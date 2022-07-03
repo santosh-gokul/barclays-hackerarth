@@ -10,12 +10,15 @@ from app.core.config import settings
 from app.helpers.preprocessing import *
 from fastapi.middleware.cors import CORSMiddleware
 from copy import deepcopy
+import requests
 
 
 userLoginDetails = {
-    'Santosh': hash('passoword')
+    'Santosh': {'pass': hash('passoword'), 'current_token': 1, 'mobile': '8277607950', 'email':
+    'santoanand2@gmail.com'}
 }
 
+orderHistory = {}
 app = FastAPI()
 
 origins = ["*"]
@@ -38,7 +41,7 @@ def validate_token(token: str):
     try:
         decode_data = jwt.decode(token, settings.SECRET, algorithms=["HS256"])
         print("decoded data", decode_data)
-        if (int(decode_data['expiry'])<=int(time.time())):
+        if (int(decode_data['expiry'])<=int(time.time()) or decode_data['token_count']>userLoginDetails[decode_data['username']]['current_token']):
             return JSONResponse(status_code=401, content={'success': False})
         return JSONResponse(status_code=200, content={'success': True})
     except jwt.exceptions.InvalidSignatureError as e:
@@ -50,10 +53,11 @@ def loginUser(loginData: LoginData):
     if loginData.uname not in userLoginDetails:
         return JSONResponse(status_code=400, content={'success': False})
     else:
-        if (hash(loginData.password)==userLoginDetails[loginData.uname]):
+        if (hash(loginData.password)==userLoginDetails[loginData.uname]['pass']):
             jwt_payload = {
                     "expiry": int(time.time()+600),
                     "username": loginData.uname,
+                    "token_count": userLoginDetails[loginData.uname]['current_token']
                 }
             encoded_jwt = jwt.encode(jwt_payload, settings.SECRET, algorithm="HS256")
             return JSONResponse(status_code=200, content={'success': True, 'token': encoded_jwt})
@@ -78,6 +82,23 @@ def get_store_details(store_name: str, token: str):
         'data': {**store_data["Bangalore Outlet Details"][store_name_list.index(store_name)]
         , 'item_count': total_item_count}
         })
+@app.get("/get_store_item_details/{store_name}/{item_name}/{token}")
+def get_store_item_detail(store_name: str, item_name: str, token: str):
+    result = validate_token(token=token)
+    if result.status_code!=200:
+       return JSONResponse(status_code=401, content={'success': False})
+
+    return JSONResponse(status_code=200, content = {'success': True,
+        'data': store_item_map[store_name][item_name]})
+
+@app.get("/logout/{token}")
+def logout(token: str):
+    result = validate_token(token=token)
+    if result.status_code!=200:
+       return JSONResponse(status_code=401, content={'success': False})
+    else:
+        decode_data = jwt.decode(token, settings.SECRET, algorithms=["HS256"])
+        userLoginDetails[decode_data['username']]['current_token']+=1
 
 @app.get("/get_item_details/{token}")
 def get_item_details(token: str):
@@ -87,12 +108,16 @@ def get_item_details(token: str):
     return JSONResponse(status_code=200, content = {'success': True,
         'data': item_data["Data"]})
     
-@app.post("/get_nearest_store/{token}")
-def get_nearest_store(token:str, input: NearestStore):
+@app.post("/get_nearest_store_and_get_payment_token/{token}")
+def get_nearest_store_and_get_payment_token(token:str, input: NearestStore):
     result = validate_token(token=token)
+    total_order_amount = 0
     if result.status_code!=200:
        return JSONResponse(status_code=401, content={'success': False})
+
     viable_candidates = []
+    order_id = int(time.time())
+    decode_data = jwt.decode(token, settings.SECRET, algorithms=["HS256"])
     for store in store_item_map:
         flag = False
         for item,count in input.item_details:
@@ -113,8 +138,29 @@ def get_nearest_store(token:str, input: NearestStore):
         input.user_location.lon)).km
             best_store = store
             store_coord = [float(lat), float(lon)]
-    
+
+    for item,count in input.item_details:
+        total_order_amount+=(int(store_item_map[best_store][item]['mrp'])*
+                (1-int(store_item_map[best_store][item]['discountPercent'])/100)*count)
+    payload = {"customer_details": {
+        "customer_id":  decode_data['username'],
+        "customer_email":  userLoginDetails[decode_data['username']]['email'],
+        "customer_phone": userLoginDetails[decode_data['username']]['mobile']
+    },  "order_id": str(order_id),"order_amount": total_order_amount,"order_currency": "INR"}
+
+    headers = {
+    "Accept": "application/json",
+    "x-client-id": settings.CASHFREE_APPID,
+    "x-client-secret": settings.CASHFREE_SECRETKEY,
+    "x-api-version": "2022-01-01",
+    "Content-Type": "application/json"}
+
+    orderHistory[decode_data['username']] = orderHistory.get(decode_data['username'], [])
+    orderHistory[decode_data['username']].append({'order_id': order_id, 'order_summary': input})
+
+    response = requests.post(settings.CASHFREE_ENDPOINT+"/orders", json=payload, headers=headers)
+
     return JSONResponse(status_code=200, content = {'success': True,
         'data': {'store_name': best_store, 'store_coordinates': store_coord},
-        'distance': min_distance})
+        'distance': min_distance, 'order_token': response["order_token"]})
         
