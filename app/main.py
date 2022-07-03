@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Path, Depends
+from fastapi import FastAPI, Path, Depends, Request
 from fastapi.responses import JSONResponse
 from app.data.items import item_data
 from app.data.store import store_data
@@ -10,6 +10,8 @@ from app.core.config import settings
 from app.helpers.preprocessing import *
 from fastapi.middleware.cors import CORSMiddleware
 from copy import deepcopy
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
 import requests
 
 
@@ -30,6 +32,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.mount("/ui/", StaticFiles(directory="my-app/build/"), name="static")
+
+@app.get("/", response_class=HTMLResponse)
+async def main(request: Request):
+    print(f"Hello from - {request.headers}")
+    with open('my-app/build/index.html') as f:
+        data = f.read()
+    return data
 
 store_name_list = [store['Store_Name'] for store in store_data["Bangalore Outlet Details"]]
 item_name_list = get_item_list()
