@@ -9,6 +9,7 @@ import time
 from app.core.config import settings
 from app.helpers.preprocessing import *
 from fastapi.middleware.cors import CORSMiddleware
+from copy import deepcopy
 
 
 userLoginDetails = {
@@ -29,7 +30,7 @@ app.add_middleware(
 
 store_name_list = [store['Store_Name'] for store in store_data["Bangalore Outlet Details"]]
 item_name_list = get_item_list()
-item_data = preprocess_item_dict(item_data)
+item_data = preprocess_item_dict(deepcopy(item_data))
 store_item_map = get_store_item_map(store_name_list, item_data)
 
 @app.get("/validate_token/{token}")
@@ -58,7 +59,6 @@ def loginUser(loginData: LoginData):
             return JSONResponse(status_code=200, content={'success': True, 'token': encoded_jwt})
         else:
             return JSONResponse(status_code=400, content={'success': False})
-
 
 @app.get("/get_store_details/{store_name}/{token}")
 def get_store_details(store_name: str, token: str):
