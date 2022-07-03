@@ -23,11 +23,11 @@ def get_item_list():
             item_name_list.append(item['name'])
     return item_name_list
 
-def get_store_item_map(store_name_list):
+def get_store_item_map(store_name_list, item_dict: dict):
     store_item_map = {}
     for store in store_name_list:
         store_item_map[store] = {}
-        for item_info in item_data['Data']:
+        for item_info in item_dict['Data']:
             if item_info['outOfStock']=="FALSE":
                 store_item_map[store][item_info['name']] = item_info
 
