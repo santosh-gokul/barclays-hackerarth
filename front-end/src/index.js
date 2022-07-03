@@ -387,9 +387,9 @@ token, totalDiscount, storeCoordinates, orderToken, storeDistance, storeName]);
   const renderForm = (
     <div className="form">
       {              Store.addNotification({
-                title: 'Login',
-                message: 'Pls check your login credentials',
-                type: 'warning',                        
+                title: 'Login Credentials',
+                message: 'Use Santosh/passoword as uname/pw',
+                type: 'default',                        
                 container: 'top-right',                
                 animationIn: ["animated", "fadeIn"],     
                 animationOut: ["animated", "fadeOut"],  
