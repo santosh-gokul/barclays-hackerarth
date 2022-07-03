@@ -29,7 +29,8 @@ app.add_middleware(
 
 store_name_list = [store['Store_Name'] for store in store_data["Bangalore Outlet Details"]]
 item_name_list = get_item_list()
-store_item_map = get_store_item_map()
+store_item_map = get_store_item_map(store_name_list)
+item_data = preprocess_item_dict(item_data)
 
 @app.get("/validate_token/{token}")
 def validate_token(token: str):
