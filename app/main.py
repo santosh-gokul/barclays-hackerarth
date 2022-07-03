@@ -9,6 +9,17 @@ import time
 from app.core.config import settings
 from fastapi.middleware.cors import CORSMiddleware
 
+app = FastAPI()
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 store_name_list = [store['Store_Name'] for store in store_data["Bangalore Outlet Details"]]
 item_name_list = []
@@ -30,18 +41,6 @@ def getTotalItemWithinAStore(store: str):
         if (int(item['quantity'])>0):
             item_count+=1
     return item_count
-
-app = FastAPI()
-
-origins = ["*"]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 userLoginDetails = {
     'Santosh': hash('passoword')
