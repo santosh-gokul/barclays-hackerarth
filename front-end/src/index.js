@@ -21,9 +21,14 @@ function App() {
   const baseEndpoint = "https://barclays-hackerearth.herokuapp.com";
 
   useEffect(() => {
+    
     var currentTimeStamp = new Date();
     var seconds = currentTimeStamp.getTime() / 1000;
     console.log(isLoggedIn)
+
+    if(sessionExpiry==-1){
+      callLoginBanner();
+    }
     if (sessionExpiry<=seconds){
       console.log(sessionExpiry)
       clearCache();
@@ -383,21 +388,23 @@ token, totalDiscount, storeCoordinates, orderToken, storeDistance, storeName]);
       <div className="error">{errorMessages.message}</div>
     );
 
+const callLoginBanner = () => {
+  Store.addNotification({
+    title: 'Login Credentials',
+    message: 'Use Santosh/passoword as uname/pw',
+    type: 'default',                        
+    container: 'top-right',                
+    animationIn: ["animated", "fadeIn"],     
+    animationOut: ["animated", "fadeOut"],  
+    dismiss: {
+      duration: 30000
+    }
+  })
+}
+
   // JSX code for login form
   const renderForm = (
     <div className="form">
-      {              Store.addNotification({
-                title: 'Login Credentials',
-                message: 'Use Santosh/passoword as uname/pw',
-                type: 'default',                        
-                container: 'top-right',                
-                animationIn: ["animated", "fadeIn"],     
-                animationOut: ["animated", "fadeOut"],  
-                dismiss: {
-                  duration: 30000
-                }
-              })
-      }
       <form onSubmit={handleLogin}>
         <div className="input-container">
           <label>Username </label>
