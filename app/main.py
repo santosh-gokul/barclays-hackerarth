@@ -7,7 +7,13 @@ import geopy.distance
 import jwt
 import time
 from app.core.config import settings
+from app.helpers.preprocessing import *
 from fastapi.middleware.cors import CORSMiddleware
+
+
+userLoginDetails = {
+    'Santosh': hash('passoword')
+}
 
 app = FastAPI()
 
@@ -22,29 +28,8 @@ app.add_middleware(
 )
 
 store_name_list = [store['Store_Name'] for store in store_data["Bangalore Outlet Details"]]
-item_name_list = []
-for item in item_data["Data"]:
-    if item['outOfStock']=="FALSE":
-        item_name_list.append(item['name'])
-store_item_map = {}
-
-for store in store_name_list:
-    store_item_map[store] = {}
-    for item_info in item_data['Data']:
-        if item_info['outOfStock']=="FALSE":
-            store_item_map[store][item_info['name']] = item_info
-
-
-def getTotalItemWithinAStore(store: str):
-    item_count = 0
-    for item in store_item_map[store].values():
-        if (int(item['quantity'])>0):
-            item_count+=1
-    return item_count
-
-userLoginDetails = {
-    'Santosh': hash('passoword')
-}
+item_name_list = get_item_list()
+store_item_map = get_store_item_map()
 
 @app.get("/validate_token/{token}")
 def validate_token(token: str):
@@ -83,11 +68,11 @@ def get_store_details(store_name: str, token: str):
         return_val = []
         for store in store_name_list:
             return_val.append({**store_data["Bangalore Outlet Details"][store_name_list.index(store)]
-            , 'item_count': getTotalItemWithinAStore(store)})
+            , 'item_count': getTotalItemWithinAStore(store, store_item_map)})
         return JSONResponse(status_code=200, content = {'success': True,
         'data': return_val})
     else:
-        total_item_count = getTotalItemWithinAStore(store_name)
+        total_item_count = getTotalItemWithinAStore(store_name, store_item_map)
         return JSONResponse(status_code=200, content = {'success': True,
         'data': {**store_data["Bangalore Outlet Details"][store_name_list.index(store_name)]
         , 'item_count': total_item_count}
@@ -112,7 +97,7 @@ def get_nearest_store(token:str, input: NearestStore):
         for item_count in input.item_details:
             item = item_count.item
             count = item_count.count
-            if(int(store_item_map[store][item]['quantity'])<count):
+            if(int(store_item_map[store][item]['availableQuantity'])<count):
                 flag = True
                 break
         if flag is False:
